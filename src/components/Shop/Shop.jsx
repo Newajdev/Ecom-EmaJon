@@ -3,37 +3,61 @@ import { addToDb, deleteShoppingCart, getShoppingCart } from '../../utilities/fa
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
-import { Link } from 'react-router-dom';
+import { Link, useLoaderData } from 'react-router-dom';
 
 const Shop = () => {
     const [products, setProducts] = useState([]);
-    const [cart, setCart] = useState([])
+    // const [cart, setCart] = useState([])
+    const cart = useLoaderData()
+    const [itemsPerpages, setItemsPerpages] = useState(10)
+    const [currentPage, setCurrentPage] = useState(0)
+    // const { count } = useLoaderData();
+    const [count, setCount]= useState(0)
+    // const count = 76;
+  
+    const totalPagenumbers = Math.ceil(count / itemsPerpages);
+    // // Option---> 01
+    // const pages =[]
+    // for(let i =0; i<totalPagenumbers; i++){
+    //     pages.push(i)
+    // }
+    // console.log(pages);
+
+    // Option---> 01
+    const pages = [...Array(totalPagenumbers).keys()]
+
+    useEffect(()=>{
+        fetch('http://localhost:5000/productsCount')
+        .then(res => res.json())
+        .then(data => setCount(data.count))
+    },[])
+
 
     useEffect(() => {
-        fetch('http://localhost:5000/products')
+        fetch(`http://localhost:5000/products?page=${currentPage}&size=${itemsPerpages}`)
             .then(res => res.json())
             .then(data => setProducts(data))
-    }, []);
+    }, [currentPage, itemsPerpages]);
 
-    useEffect(() => {
-        const storedCart = getShoppingCart();
-        const savedCart = [];
-        // step 1: get id of the addedProduct
-        for (const id in storedCart) {
-            // step 2: get product from products state by using id
-            const addedProduct = products.find(product => product._id === id)
-            if (addedProduct) {
-                // step 3: add quantity
-                const quantity = storedCart[id];
-                addedProduct.quantity = quantity;
-                // step 4: add the added product to the saved cart
-                savedCart.push(addedProduct);
-            }
-            // console.log('added Product', addedProduct)
-        }
-        // step 5: set the cart
-        setCart(savedCart);
-    }, [products])
+    // useEffect(() => {
+    //     const storedCart = getShoppingCart();
+    //     const savedCart = [];
+    //     // step 1: get id of the addedProduct
+    //     for (const id in storedCart) {
+    //         // step 2: get product from products state by using id
+    //         const addedProduct = products.find(product => product._id === id)
+    //         if (addedProduct) {
+    //             // step 3: add quantity
+    //             const quantity = storedCart[id];
+    //             addedProduct.quantity = quantity;
+    //             // step 4: add the added product to the saved cart
+    //             savedCart.push(addedProduct);
+    //         }
+    //         // console.log('added Product', addedProduct)
+    //     }
+    //     // step 5: set the cart
+    //     setCart(savedCart);
+    // }, [products])
 
     const handleAddToCart = (product) => {
         // cart.push(product); '
@@ -60,9 +84,27 @@ const Shop = () => {
         setCart([]);
         deleteShoppingCart();
     }
+    const hendleItemPagesChange = e => {
+        e.preventDefault();
+        setItemsPerpages(parseInt(e.target.value))
+        setCurrentPage(0)
+    }
+    const hendlePriveusPage =()=>{
+        if(currentPage > 0){
+            setCurrentPage(currentPage - 1)
+            // setCurrentPage(currentPage)
+        }
+    }
+    const hendleNextPage =()=>{
+        if(currentPage < pages.length -1 ){
+            setCurrentPage(currentPage + 1)
+            // setCurrentPage(currentPage)
+        }
+    }
 
     return (
         <div className='shop-container'>
+
             <div className="products-container">
                 {
                     products.map(product => <Product
@@ -81,6 +123,26 @@ const Shop = () => {
                         <button className='btn-proceed'>Review Order</button>
                     </Link>
                 </Cart>
+            </div>
+            <div className='pagination'>
+                <p>Current Page: {currentPage}</p>
+                <button onClick={hendlePriveusPage}>Previus</button>
+                {
+                    pages.map(page => <button
+                        className={currentPage === page && 'selected'}
+                        onClick={ ()=>setCurrentPage(page)}
+                        key={page}
+                        >
+                        {page}
+                    </button>)
+                }
+                <button onClick={hendleNextPage}>next</button>
+                <select value={itemsPerpages} onChange={hendleItemPagesChange} name="" id="">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
             </div>
         </div>
     );

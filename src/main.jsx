@@ -11,7 +11,7 @@ import Home from './components/Layout/Home';
 import Orders from './components/Orders/Orders';
 import Inventory from './components/Inventory/Inventory';
 import Login from './components/Login/Login';
-import cartProductsLoader from './loaders/cartProductsLoader';
+import cartProductsLoader from '../src/utilities/loaders/cartProductsLoader';
 import Checkout from './components/Checkout/Checkout';
 
 const router = createBrowserRouter([
@@ -21,7 +21,9 @@ const router = createBrowserRouter([
     children: [
       {
         path: '/',
-        element: <Shop></Shop>
+        element: <Shop></Shop>,
+        // loader: ()=> fetch('http://localhost:5000/productsCount'),
+        loader: cartProductsLoader
       },
       {
         path: 'orders',
