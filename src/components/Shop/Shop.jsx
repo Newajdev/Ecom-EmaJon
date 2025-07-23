@@ -27,14 +27,14 @@ const Shop = () => {
     const pages = [...Array(totalPagenumbers).keys()]
 
     useEffect(()=>{
-        fetch('http://localhost:5000/productsCount')
+        fetch('https://ecom-emo-server.vercel.app/productsCount')
         .then(res => res.json())
         .then(data => setCount(data.count))
     },[])
 
 
     useEffect(() => {
-        fetch(`http://localhost:5000/products?page=${currentPage}&size=${itemsPerpages}`)
+        fetch(`https://ecom-emo-server.vercel.app/products?page=${currentPage}&size=${itemsPerpages}`)
             .then(res => res.json())
             .then(data => setProducts(data))
     }, [currentPage, itemsPerpages]);

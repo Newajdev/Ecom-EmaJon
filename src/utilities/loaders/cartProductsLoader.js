@@ -6,7 +6,7 @@ const cartProductsLoader = async () => {
     const storedcardIds = Object.keys(storedCart)
     console.log(storedcardIds);
 
-    const loadedProducts = await fetch('http://localhost:5000/productsByIds',{
+    const loadedProducts = await fetch('https://ecom-emo-server.vercel.app/productsByIds',{
         method: 'POST',
         headers:{
             'content-type': 'application/json'
